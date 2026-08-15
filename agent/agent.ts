@@ -12,5 +12,6 @@ import { defineAgent } from "eve";
  */
 export default defineAgent({
   compaction: { thresholdPercent: 0.9 },
-  model: "anthropic/claude-opus-5",
+  model: "openai/gpt-5.4-mini",
+  reasoning: "high",
 });

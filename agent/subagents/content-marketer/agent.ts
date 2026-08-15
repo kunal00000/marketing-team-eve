@@ -23,5 +23,6 @@ export default defineAgent({
     "in a chat thread. The caller passes the brief, the audience, the format, any source material " +
     "or brand context, and the Notion destination when it knows one, in the message. Does not " +
     "publish, schedule, or touch social accounts.",
-  model: "anthropic/claude-opus-5",
+  model: "openai/gpt-5.4-mini",
+  reasoning: "high",
 });

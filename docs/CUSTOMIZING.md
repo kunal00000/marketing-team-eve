@@ -6,27 +6,27 @@ Run `pnpm validate` after any change, and `npx eve info` to see what eve discove
 
 ## Where to change things
 
-| To change | Edit |
-| --- | --- |
-| Brand context | Ask the lead; it routes to `product-marketer`. Stored in Blob, not the repo |
-| Voice, all surfaces | `agent/lib/writing-quality/config.ts` |
-| Voice, one surface | `agent/subagents/<id>/skills/<surface>-style/` |
-| Banned words | `references/banned-words.json` in that style skill |
-| The lead's behavior | `agent/instructions.md` |
-| A specialist's behavior | `agent/subagents/<id>/instructions.md` |
-| Models | `agent/agent.ts`, `agent/subagents/<id>/agent.ts`, or `/model` in the TUI |
-| Approval gates | `APPROVAL_REQUIRED_TOOLS` in `notion.ts`, `DELETE_TOOLS`/`PUBLISH_TOOLS` in `typefully.ts`, `SEND_TOOLS`/`DESTRUCTIVE_TOOLS` in `resend.ts` |
-| Resend's tool surface | `ALLOWED_TOOLS` in `agent/subagents/email/connections/resend.ts` |
-| Slack suggested prompts | `SUGGESTED_PROMPTS` in `agent/channels/slack.ts` |
+| To change               | Edit                                                                                                                                        |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| Brand context           | Ask the lead; it routes to `product-marketer`. Stored in Blob, not the repo                                                                 |
+| Voice, all surfaces     | `agent/lib/writing-quality/config.ts`                                                                                                       |
+| Voice, one surface      | `agent/subagents/<id>/skills/<surface>-style/`                                                                                              |
+| Banned words            | `references/banned-words.json` in that style skill                                                                                          |
+| The lead's behavior     | `agent/instructions.md`                                                                                                                     |
+| A specialist's behavior | `agent/subagents/<id>/instructions.md`                                                                                                      |
+| Models                  | `agent/agent.ts`, `agent/subagents/<id>/agent.ts`, or `/model` in the TUI                                                                   |
+| Approval gates          | `APPROVAL_REQUIRED_TOOLS` in `notion.ts`, `DELETE_TOOLS`/`PUBLISH_TOOLS` in `typefully.ts`, `SEND_TOOLS`/`DESTRUCTIVE_TOOLS` in `resend.ts` |
+| Resend's tool surface   | `ALLOWED_TOOLS` in `agent/subagents/email/connections/resend.ts`                                                                            |
+| Slack suggested prompts | `SUGGESTED_PROMPTS` in `agent/channels/slack.ts`                                                                                            |
 
 ## Remove what you do not use
 
-| Not using | Delete |
-| --- | --- |
-| Email | `agent/subagents/email/` |
-| Social | `agent/subagents/social-media-coordinator/` |
-| SEO | `agent/subagents/seo/` |
-| Slack | `agent/channels/slack.ts` |
+| Not using | Delete                                      |
+| --------- | ------------------------------------------- |
+| Email     | `agent/subagents/email/`                    |
+| Social    | `agent/subagents/social-media-coordinator/` |
+| SEO       | `agent/subagents/seo/`                      |
+| Slack     | `agent/channels/slack.ts`                   |
 
 Nothing references a specialist by name, so deleting the directory is the whole job. Keep `product-marketer`; it owns the brand context everything else reads.
 
@@ -43,7 +43,8 @@ export default defineAgent({
   description:
     "Write and place press material: releases, media pitches, and spokesperson quotes. " +
     "Pass the announcement, the target publications, and any embargo in the message.",
-  model: "anthropic/claude-opus-5",
+  model: "openai/gpt-5.4-mini",
+  reasoning: "high",
 });
 ```
 
@@ -83,15 +84,22 @@ import { z } from "zod";
 
 export const findJournalistsTool = () =>
   defineTool({
-    description: "Find journalists covering a beat. Call before writing a pitch.",
+    description:
+      "Find journalists covering a beat. Call before writing a pitch.",
     async execute({ beat }) {
       return { journalists: [] };
     },
     inputSchema: z.object({
-      beat: z.string().min(1).max(200).describe("Subject area, e.g. 'developer tools'."),
+      beat: z
+        .string()
+        .min(1)
+        .max(200)
+        .describe("Subject area, e.g. 'developer tools'."),
     }),
     outputSchema: z.object({
-      journalists: z.array(z.string()).describe("One entry per journalist found."),
+      journalists: z
+        .array(z.string())
+        .describe("One entry per journalist found."),
     }),
   });
 ```
@@ -141,16 +149,16 @@ const SUGGESTED_PROMPTS: SuggestedPrompt[] = [
 
 ## Gotchas
 
-| Symptom | Fix |
-| --- | --- |
-| Skill missing from `eve info` | Its `description` has a colon followed by a space. Rephrase around it |
-| Skill missing, no diagnostic | Its name must start with an alphanumeric character |
-| `references/` unreadable | That agent needs its own `sandbox.ts` |
-| Model starts using `curl` | You deleted `tools/bash.ts` |
-| Lint rejects a tool file | Use the factory pattern, not a re-export |
-| Import fails to resolve | Add the `.js` extension |
-| `pnpm fix` will not fix a type | Change the `type` alias to an `interface` by hand |
-| `eve info` shows 0 skills | Expected; that count is root only |
+| Symptom                        | Fix                                                                   |
+| ------------------------------ | --------------------------------------------------------------------- |
+| Skill missing from `eve info`  | Its `description` has a colon followed by a space. Rephrase around it |
+| Skill missing, no diagnostic   | Its name must start with an alphanumeric character                    |
+| `references/` unreadable       | That agent needs its own `sandbox.ts`                                 |
+| Model starts using `curl`      | You deleted `tools/bash.ts`                                           |
+| Lint rejects a tool file       | Use the factory pattern, not a re-export                              |
+| Import fails to resolve        | Add the `.js` extension                                               |
+| `pnpm fix` will not fix a type | Change the `type` alias to an `interface` by hand                     |
+| `eve info` shows 0 skills      | Expected; that count is root only                                     |
 
 The Notion connection is copied per agent and the copies must match. This should print `1`:
 

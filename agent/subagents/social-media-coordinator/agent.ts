@@ -19,5 +19,6 @@ export default defineAgent({
     "follower analytics). Researches facts and reviews its own drafts before handing them back. " +
     "The caller passes the brief or source material, the target platforms, and any angle, " +
     "audience, or timing constraints in the message.",
-  model: "anthropic/claude-opus-5",
+  model: "openai/gpt-5.4-mini",
+  reasoning: "high",
 });
